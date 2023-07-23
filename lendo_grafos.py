@@ -59,6 +59,7 @@ def print_graph(graph):
 def dijkstra(vertexes: dict, start: Vertex, end: Vertex):
     distance = {key: float("inf") for key in vertexes.keys()}
     visited = {key: False for key in vertexes.keys()}
+    precedents = {key: None for key in vertexes.keys()}
 
     distance[start.edge_name] = 0
 
@@ -85,6 +86,30 @@ def dijkstra(vertexes: dict, start: Vertex, end: Vertex):
                     distance[adjacent.destination.edge_name] = (
                         distance[minimal_key] + adjacent.cost
                     )
+                    precedents[adjacent.destination.edge_name] = adjacent
+
+    print("====================================================")
+    current_vertex = end
+    path_list = []
+    while current_vertex != start:
+        edge_info = precedents[current_vertex.edge_name]
+        try:
+            path_list.append(
+                dict(
+                    vertex=edge_info.destination.edge_name, way=edge_info.transportation
+                )
+            )
+        except AttributeError:
+            print(f"There's no path from {start} to {end}")
+            return
+        current_vertex = vertexes[edge_info.origin.edge_name]
+
+    path_list.reverse()
+    path = f"{start.edge_name}"
+    for value in path_list:
+        path += f" {value['way']} {value['vertex']}"
+
+    print(path)
 
     print("====================================================")
     print(f"{start} ==> {end} {distance[end.edge_name]}")
